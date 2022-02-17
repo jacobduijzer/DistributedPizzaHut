@@ -1,29 +1,40 @@
 ﻿using GreenPipes;
 using MassTransit;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using PaymentMicroservice;
 
-var busControl = Bus.Factory.CreateUsingRabbitMq(cfg =>
-{
-    cfg.Host("localhost");
-    cfg.ReceiveEndpoint("payment-service", e =>
-    {
-        e.UseInMemoryOutbox();
-        e.Consumer<OrderCreatedEventConsumer>(c =>
-            c.UseMessageRetry(m => m.Interval(5, new TimeSpan(0, 0, 10))));
-    });
-});
-var source = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-await busControl.StartAsync(source.Token);
-Console.WriteLine("Payment Microservice Now Listening");
-try
-{
-    while (true)
-    {
-        //sit in while loop listening for messages
-        await Task.Delay(100);
-    }
-}
-finally
-{
-    await busControl.StopAsync();
-}
+const string serviceName = "payment-service";
+const string zipkinEndpoint = "http://localhost:9411/api/v2/spans";
+
+await Host
+    .CreateDefaultBuilder(args)
+    .ConfigureServices((_, services) =>
+        services.AddMassTransit(x =>
+            {
+                x.SetKebabCaseEndpointNameFormatter();
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host("localhost");
+                    cfg.UseInMemoryOutbox();
+                    cfg.ReceiveEndpoint(serviceName,
+                        c =>
+                            c.Consumer<OrderCreatedEventConsumer>(c =>
+                                c.UseMessageRetry(m => m.Interval(5, new TimeSpan(0, 0, 10))))
+                    );
+                });
+            })
+            .AddOpenTelemetryTracing(builder =>
+            {
+                builder
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault()
+                        .AddService(typeof(Program).Assembly.GetName().Name))
+                    .AddMassTransitInstrumentation()
+                    // .AddAspNetCoreInstrumentation()
+                    // .AddHttpClientInstrumentation()
+                    .AddConsoleExporter()
+                    .AddZipkinExporter(with => with.Endpoint = new Uri(zipkinEndpoint));
+            }).AddHostedService<ConsoleHostedService>())
+    .RunConsoleAsync();
