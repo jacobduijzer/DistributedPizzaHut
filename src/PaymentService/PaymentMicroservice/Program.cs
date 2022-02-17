@@ -6,8 +6,9 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using PaymentMicroservice;
 
-const string serviceName = "payment-service";
 const string zipkinEndpoint = "http://localhost:9411/api/v2/spans";
+
+string serviceName = typeof(Program).Assembly.GetName().Name!;
 
 await Host
     .CreateDefaultBuilder(args)
@@ -30,10 +31,8 @@ await Host
             {
                 builder
                     .SetResourceBuilder(ResourceBuilder.CreateDefault()
-                        .AddService(typeof(Program).Assembly.GetName().Name))
+                        .AddService(serviceName))
                     .AddMassTransitInstrumentation()
-                    // .AddAspNetCoreInstrumentation()
-                    // .AddHttpClientInstrumentation()
                     .AddConsoleExporter()
                     .AddZipkinExporter(with => with.Endpoint = new Uri(zipkinEndpoint));
             }).AddHostedService<ConsoleHostedService>())

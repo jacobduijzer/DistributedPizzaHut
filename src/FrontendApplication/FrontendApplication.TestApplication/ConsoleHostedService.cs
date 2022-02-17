@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FrontendApplication.TestApplication;
 
-internal class ConsoleHostedService : IHostedService
+public class ConsoleHostedService : IHostedService
 {
     private readonly ILogger _logger;
     private readonly IHostApplicationLifetime _appLifetime;

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace OrderMicroservice;
 
-internal sealed class ConsoleHostedService : IHostedService
+public sealed class ConsoleHostedService : IHostedService
 {
     private readonly ILogger _logger;
     private readonly IHostApplicationLifetime _appLifetime;

@@ -9,19 +9,35 @@ services:
     image: rabbitmq:3-management-alpine
     container_name: 'pizzahut.messagebus'
     ports:
-        - 5672:5672
-        - 15672:15672
+      - 5672:5672
+      - 15672:15672
     volumes:
-        - pizzahut_messagebus_data:/var/lib/rabbitmq/
+      - pizzahut_messagebus_data:/var/lib/rabbitmq/
     networks:
-        - pizzahut
+      - pizzahut
 
   pizzahut.zipkin:
     image: openzipkin/zipkin:latest
     ports:
       - "9411:9411"
+  
+  pizzahut.orders:
+    image: library/postgres:11
+    container_name: pizzahut.orders
+    environment:
+      TZ: Europe/Amsterdam
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: Orders
+    ports:
+      - 5432:5432
+    volumes:
+      - orderdatabase_db_data:/var/lib/postgresql/data
+    restart: always
+    
 
 volumes:
   pizzahut_messagebus_data:
     name: pizzahut_messagebus_data
+  orderdatabase_db_data:
 

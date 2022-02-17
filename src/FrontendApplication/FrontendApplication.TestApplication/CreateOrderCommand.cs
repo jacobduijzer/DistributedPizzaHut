@@ -23,13 +23,13 @@ public class CreateOrderCommand
                 {
                     PizzaId = Guid.NewGuid(),
                     Name = "Some Pizza",
-                    Price = 5.95
+                    Price = 5.95m
                 },
                 new Pizza
                 {
                     PizzaId = Guid.NewGuid(),
                     Name = "Another Pizza",
-                    Price = 6.95
+                    Price = 6.95m
                 }
             }
         });
