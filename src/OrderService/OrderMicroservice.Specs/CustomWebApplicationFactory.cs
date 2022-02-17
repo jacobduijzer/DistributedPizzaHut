@@ -27,7 +27,7 @@ public class CustomWebApplicationFactory<TStartup>
             var hostedService = services.SingleOrDefault(s => s.ImplementationType == typeof(ConsoleHostedService));
             services.Remove(hostedService);
 
-            var orderDbContext = services.SingleOrDefault(x => x.ImplementationType == typeof(OrderDbContext));
+            var orderDbContext = services.SingleOrDefault(x => x.ServiceType == typeof(DbContextOptions<OrderDbContext>));
             services.Remove(orderDbContext);
 
             services.AddDbContext<OrderDbContext>(options => options.UseInMemoryDatabase("Orders"));
