@@ -7,7 +7,7 @@ This Distributed Pizza Hut is my attempt to practice with some distributed princ
 1. Start RabbitMQ and ZipKin: `docker-compose -f docker-compose.tools.yml up`.
 2. Start the three dotnet projects: `PaymentMicroservice`, `OrderMicroservice` and `FrontendApplication`.
 3. When everything is running, press enter in the console of the Frontend application.
-4. Whatch what happens :)
+4. See what happens :)
 
 ## Context Diagram
 
